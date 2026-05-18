@@ -18,19 +18,8 @@
   min-height: 100vh;
   height: 100vh;
   overflow: hidden;
-  background-color: var(--app-bg);
-  background-image: var(--app-bg-gradient);
+  background: transparent;
   color: var(--text-primary);
-
-  &::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    background-color: var(--app-bg);
-    background-image: var(--app-bg-gradient);
-    pointer-events: none;
-  }
 
   &.sidebar-is-collapsed {
     --sidebar-active-width: var(--sidebar-collapsed-width);
@@ -62,7 +51,7 @@
   backdrop-filter: blur(var(--app-blur));
   -webkit-backdrop-filter: blur(var(--app-blur));
   border-bottom: 1px solid var(--app-border);
-  box-shadow: var(--app-shadow-soft);
+  box-shadow: none;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -176,7 +165,7 @@
   border: 1px solid var(--glass-border);
   border-radius: var(--app-radius-md);
   background: var(--glass-bg);
-  box-shadow: var(--glass-shadow);
+  box-shadow: none;
   backdrop-filter: blur(var(--app-blur));
   -webkit-backdrop-filter: blur(var(--app-blur));
 }
@@ -327,9 +316,7 @@
   border: 1px solid rgba(10, 126, 220, 0.25);
   color: #1d72d6;
   font-weight: 700;
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.75),
-    0 4px 10px rgba(10, 126, 220, 0.18);
+  box-shadow: none;
 }
 
 .user-name {
@@ -372,8 +359,10 @@
   height: 100%;
   overflow: hidden;
   background: var(--sidebar-bg-color);
+  backdrop-filter: blur(var(--app-blur));
+  -webkit-backdrop-filter: blur(var(--app-blur));
   border-right: 1px solid var(--app-border);
-  box-shadow: var(--sidebar-shadow);
+  box-shadow: none;
   display: flex;
   flex-direction: column;
   transition:

@@ -456,7 +456,7 @@ export function MainLayout() {
       pathname === '/ai-providers' || pathname.startsWith('/ai-providers/');
     if (isAuthFiles(from) && isAuthFiles(to)) return 'ios';
     if (isAiProviders(from) && isAiProviders(to)) return 'ios';
-    return 'vertical';
+    return 'none';
   }, []);
 
   const handleRefreshAll = async () => {

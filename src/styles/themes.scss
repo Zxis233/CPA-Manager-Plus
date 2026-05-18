@@ -4,7 +4,7 @@
  * 设计 token 参考 dudu-admin：
  * - 玻璃拟态页面表面
  * - 清透蓝色主渐变
- * - 固定侧栏与顶部导航的低对比边框/阴影
+ * - 固定侧栏与顶部导航的低对比边框
  *
  * 同时保留当前项目既有 --bg-*、--text-*、--color-* 变量，避免业务页面逐个迁移。
  */
@@ -24,8 +24,8 @@
   --app-surface-muted: rgba(255, 255, 255, 0.62);
   --app-border: rgba(15, 23, 42, 0.08);
   --app-border-strong: rgba(15, 23, 42, 0.12);
-  --app-shadow: 0 12px 32px rgba(31, 38, 135, 0.12);
-  --app-shadow-soft: 0 6px 16px rgba(31, 38, 135, 0.08);
+  --app-shadow: none;
+  --app-shadow-soft: none;
   --app-text-primary: #2c3e50;
   --app-text-regular: #5f6c7b;
   --app-text-muted: #8b95a6;
@@ -38,12 +38,12 @@
   --app-card-padding: 24px;
   --app-blur: 20px;
 
-  --sidebar-bg-color: rgba(255, 255, 255, 0.72);
+  --sidebar-bg-color: rgba(255, 255, 255, 0.54);
   --sidebar-text-color: var(--app-text-regular);
   --sidebar-active-text-color: var(--app-text-primary);
   --sidebar-hover-bg-color: rgba(10, 126, 220, 0.08);
-  --sidebar-logo-bg-color: rgba(255, 255, 255, 0.82);
-  --sidebar-shadow: 2px 0 12px rgba(31, 38, 135, 0.12);
+  --sidebar-logo-bg-color: rgba(255, 255, 255, 0.34);
+  --sidebar-shadow: none;
   --sidebar-width: 210px;
   --sidebar-collapsed-width-token: 54px;
 
@@ -51,7 +51,7 @@
   --glass-bg: rgba(255, 255, 255, 0.75);
   --glass-bg-secondary: rgba(255, 255, 255, 0.58);
   --glass-border: rgba(255, 255, 255, 0.6);
-  --glass-shadow: var(--app-shadow);
+  --glass-shadow: none;
   --glass-blur: var(--app-blur);
   --glass-backdrop-filter: blur(var(--glass-blur));
   --glass-filter: blur(var(--glass-blur));
@@ -69,7 +69,7 @@
   --bg-error-light: #fef0f0;
   --floating-surface: var(--app-surface);
   --floating-border: var(--app-border);
-  --floating-shadow: var(--app-shadow);
+  --floating-shadow: none;
 
   --text-primary: var(--app-text-primary);
   --text-secondary: var(--app-text-regular);
@@ -153,8 +153,8 @@
   --count-badge-bg: var(--color-primary-light-9);
   --count-badge-text: var(--color-primary-dark-2);
 
-  --shadow: var(--app-shadow-soft);
-  --shadow-lg: var(--app-shadow);
+  --shadow: none;
+  --shadow-lg: none;
   --radius-md: var(--app-radius-md);
   --accent-tertiary: var(--app-accent-soft);
 }
@@ -168,7 +168,8 @@
   --bg-quinary: #ffffff;
   --glass-bg: rgba(255, 255, 255, 0.82);
   --glass-bg-secondary: rgba(255, 255, 255, 0.7);
-  --sidebar-bg-color: rgba(255, 255, 255, 0.82);
+  --sidebar-bg-color: rgba(255, 255, 255, 0.58);
+  --sidebar-logo-bg-color: rgba(255, 255, 255, 0.38);
 }
 
 [data-theme='dark'] {
@@ -186,24 +187,24 @@
   --app-surface-muted: rgba(255, 255, 255, 0.08);
   --app-border: rgba(255, 255, 255, 0.08);
   --app-border-strong: rgba(255, 255, 255, 0.12);
-  --app-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
-  --app-shadow-soft: 0 8px 20px rgba(0, 0, 0, 0.45);
+  --app-shadow: none;
+  --app-shadow-soft: none;
   --app-text-primary: #e5e5e5;
   --app-text-regular: #a3a3a3;
   --app-text-muted: #7a7a7a;
   --app-accent-soft: rgba(50, 166, 255, 0.18);
 
-  --sidebar-bg-color: rgba(24, 28, 40, 0.72);
-  --sidebar-logo-bg-color: transparent;
+  --sidebar-bg-color: rgba(24, 28, 40, 0.42);
+  --sidebar-logo-bg-color: rgba(24, 28, 40, 0.28);
   --sidebar-hover-bg-color: rgba(255, 255, 255, 0.05);
   --sidebar-text-color: #a3a3a3;
   --sidebar-active-text-color: #ffffff;
-  --sidebar-shadow: 2px 0 12px rgba(0, 0, 0, 0.5);
+  --sidebar-shadow: none;
 
   --glass-bg: rgba(24, 28, 40, 0.72);
   --glass-bg-secondary: rgba(255, 255, 255, 0.08);
   --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --glass-shadow: none;
   --app-input-bg: var(--app-surface-strong);
   --app-input-bg-focus: var(--app-surface-strong);
   --app-input-border: var(--app-border-strong);
@@ -216,7 +217,7 @@
   --bg-error-light: #2b1719;
   --floating-surface: var(--app-surface);
   --floating-border: var(--app-border);
-  --floating-shadow: var(--app-shadow);
+  --floating-shadow: none;
 
   --text-primary: var(--app-text-primary);
   --text-secondary: var(--app-text-regular);
@@ -271,8 +272,8 @@
   --primary-active: var(--color-primary);
   --primary-ring: rgba(50, 166, 255, 0.28);
   --count-badge-text: var(--color-primary-light-3);
-  --shadow: var(--app-shadow-soft);
-  --shadow-lg: var(--app-shadow);
+  --shadow: none;
+  --shadow-lg: none;
 }
 
 @media (max-width: 768px),

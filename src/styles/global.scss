@@ -11,7 +11,6 @@
 
 body {
   background-color: var(--app-bg);
-  background-image: var(--app-bg-gradient);
   color: var(--text-primary);
   transition:
     background-color $transition-normal,
@@ -32,6 +31,12 @@ body.modal-open {
 
 body.modal-open .content {
   overflow: hidden;
+}
+
+.app-content {
+  position: relative;
+  z-index: 1;
+  min-height: 100%;
 }
 
 // 滚动条样式

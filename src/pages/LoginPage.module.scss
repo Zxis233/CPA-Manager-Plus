@@ -4,8 +4,7 @@
 .container {
   min-height: 100vh;
   display: flex;
-  background-color: var(--app-bg);
-  background-image: var(--app-bg-gradient);
+  background: transparent;
 }
 
 // 左侧品牌展示区
