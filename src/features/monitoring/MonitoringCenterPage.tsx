@@ -76,6 +76,7 @@ import {
   AccountSummaryPrimary,
 } from '@/features/monitoring/components/AccountOverviewCard';
 import { ApiKeySummaryPanel } from '@/features/monitoring/components/ApiKeySummaryPanel';
+import { MonitoringCustomRangeModal } from '@/features/monitoring/components/MonitoringCustomRangeModal';
 import {
   PaginationControls,
   RecentPattern,
@@ -2227,54 +2228,17 @@ const EMPTY_ACCOUNT_AUTH_STATE: MonitoringAccountAuthState = {
         ) : null}
       </MonitoringPanel>
 
-      <Modal
+      <MonitoringCustomRangeModal
         open={isCustomRangeModalOpen}
         onClose={() => setIsCustomRangeModalOpen(false)}
-        title={t('monitoring.range_custom')}
-        width={560}
-        className={styles.monitorModal}
-        footer={
-          <div className={styles.customRangeModalFooter}>
-            <Button variant="secondary" size="sm" onClick={() => setIsCustomRangeModalOpen(false)}>
-              {t('common.cancel')}
-            </Button>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={applyCustomTimeRange}
-              disabled={Boolean(customDraftTimeRangeError)}
-            >
-              {t('common.confirm')}
-            </Button>
-          </div>
-        }
-      >
-        <div className={styles.customRangeModalBody}>
-          <div className={styles.customRangeModalGrid}>
-            <Input
-              type="datetime-local"
-              label={t('monitoring.custom_range_start')}
-              value={customDraftStartInput}
-              onChange={handleCustomDraftStartChange}
-              className={styles.customRangeInput}
-              aria-invalid={Boolean(customDraftTimeRangeError)}
-            />
-            <Input
-              type="datetime-local"
-              label={t('monitoring.custom_range_end')}
-              value={customDraftEndInput}
-              onChange={handleCustomDraftEndChange}
-              className={styles.customRangeInput}
-              aria-invalid={Boolean(customDraftTimeRangeError)}
-            />
-          </div>
-          {customDraftTimeRangeError ? (
-            <div className={styles.customRangeError} role="alert">
-              {customDraftTimeRangeError}
-            </div>
-          ) : null}
-        </div>
-      </Modal>
+        startInput={customDraftStartInput}
+        endInput={customDraftEndInput}
+        error={customDraftTimeRangeError}
+        t={t}
+        onApply={applyCustomTimeRange}
+        onStartChange={handleCustomDraftStartChange}
+        onEndChange={handleCustomDraftEndChange}
+      />
 
       <Modal
         open={isPriceModalOpen}
