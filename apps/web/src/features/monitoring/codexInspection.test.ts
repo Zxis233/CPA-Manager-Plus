@@ -15,7 +15,13 @@ import {
   type CodexInspectionResultItem,
   type CodexInspectionRunResult,
 } from './codexInspection';
-import { countActions, filterByAction } from './model/codexInspectionPresentation';
+import {
+  countActions,
+  filterByAction,
+  getCanonicalServerCodexInspectionActionIds,
+  isActionableServerCodexInspectionResult,
+  normalizeServerCodexInspectionActionStatus,
+} from './model/codexInspectionPresentation';
 
 const createStorage = () => {
   const values = new Map<string, string>();
@@ -113,7 +119,10 @@ describe('Codex inspection settings', () => {
   it('migrates legacy auto execute settings to auto disable', () => {
     const storage = createStorage();
     vi.stubGlobal('localStorage', storage);
-    storage.setItem(CODEX_INSPECTION_SETTINGS_STORAGE_KEY, JSON.stringify({ autoExecuteActions: true }));
+    storage.setItem(
+      CODEX_INSPECTION_SETTINGS_STORAGE_KEY,
+      JSON.stringify({ autoExecuteActions: true })
+    );
 
     expect(loadCodexInspectionConfigurableSettings(null).autoActionMode).toBe('disable');
   });
@@ -126,12 +135,14 @@ describe('resolveCodexInspectionAutoActionItems', () => {
   const reauthItem = createResultItem('reauth', { statusCode: 401 });
 
   it('does nothing when automatic mode is none', () => {
-    expect(resolveCodexInspectionAutoActionItems('none', [
-      deleteItem,
-      disableItem,
-      enableItem,
-      reauthItem,
-    ])).toEqual([]);
+    expect(
+      resolveCodexInspectionAutoActionItems('none', [
+        deleteItem,
+        disableItem,
+        enableItem,
+        reauthItem,
+      ])
+    ).toEqual([]);
   });
 
   it('only enables recovered accounts in auto enable mode', () => {
@@ -142,9 +153,7 @@ describe('resolveCodexInspectionAutoActionItems', () => {
       reauthItem,
     ]);
 
-    expect(items.map((item) => [item.fileName, item.action])).toEqual([
-      ['enable.json', 'enable'],
-    ]);
+    expect(items.map((item) => [item.fileName, item.action])).toEqual([['enable.json', 'enable']]);
   });
 
   it('turns delete suggestions into disable actions in auto disable mode', () => {
@@ -198,6 +207,32 @@ describe('Codex inspection action presentation', () => {
   });
 });
 
+describe('Server Codex inspection action presentation', () => {
+  it('normalizes pending action status for server results', () => {
+    expect(normalizeServerCodexInspectionActionStatus({ action: 'delete' })).toBe('pending');
+    expect(normalizeServerCodexInspectionActionStatus({ action: 'keep' })).toBe('none');
+    expect(isActionableServerCodexInspectionResult({ id: 1, action: 'disable' })).toBe(true);
+    expect(
+      isActionableServerCodexInspectionResult({
+        id: 2,
+        action: 'disable',
+        actionStatus: 'success',
+      })
+    ).toBe(false);
+  });
+
+  it('exposes only the first file-level server action as executable', () => {
+    const canonicalIds = getCanonicalServerCodexInspectionActionIds([
+      { id: 1, fileName: 'auth-a.json', action: 'delete', actionStatus: 'success' },
+      { id: 2, fileName: 'auth-a.json', action: 'delete', actionStatus: 'pending' },
+      { id: 3, fileName: 'auth-b.json', action: 'disable', actionStatus: 'failed' },
+      { id: 4, fileName: 'auth-c.json', action: 'reauth' },
+    ]);
+
+    expect(Array.from(canonicalIds)).toEqual([3]);
+  });
+});
+
 describe('executeCodexInspectionActions', () => {
   it('uses action concurrency for disable and enable operations', async () => {
     let activeStatusUpdates = 0;
@@ -241,7 +276,10 @@ describe('Codex inspection last-run cache', () => {
     );
 
     expect(fingerprint).toBe(
-      createCodexInspectionConnectionFingerprint('https://cpa.example.test', 'management-secret-token')
+      createCodexInspectionConnectionFingerprint(
+        'https://cpa.example.test',
+        'management-secret-token'
+      )
     );
     expect(fingerprint).not.toContain('management-secret-token');
     expect(fingerprint).not.toContain('cpa.example.test');

@@ -9,6 +9,7 @@ import {
   type CodexInspectionStoredActionFilter,
   type CodexInspectionStoredLogEntry,
 } from '@/features/monitoring/codexInspection';
+import type { CodexInspectionResult } from '@/services/api/usageService';
 
 export type RunStatus = 'idle' | 'running' | 'paused' | 'success' | 'error';
 
@@ -21,6 +22,13 @@ export type InspectionLogEntry = CodexInspectionStoredLogEntry;
 export type ExecutionTriggerSource = 'manual' | 'auto';
 
 export type CodexInspectionProblemActionMode = 'none' | 'disable' | 'delete';
+export type ServerCodexInspectionAction = 'delete' | 'disable' | 'enable';
+export type ServerCodexInspectionActionStatus =
+  | 'none'
+  | 'pending'
+  | 'success'
+  | 'failed'
+  | 'skipped';
 
 export const CODEX_INSPECTION_PROBLEM_ACTION_MODES: readonly CodexInspectionProblemActionMode[] =
   ['none', 'disable', 'delete'];
@@ -114,6 +122,55 @@ export const formatActionLabel = (action: CodexInspectionAction, t: TFunction) =
     default:
       return t('monitoring.codex_inspection_action_keep');
   }
+};
+
+export const isServerCodexInspectionAction = (
+  action: string
+): action is ServerCodexInspectionAction =>
+  action === 'delete' || action === 'disable' || action === 'enable';
+
+export const normalizeServerCodexInspectionActionStatus = (
+  item: Pick<CodexInspectionResult, 'action' | 'actionStatus'>
+): ServerCodexInspectionActionStatus => {
+  if (
+    item.actionStatus === 'none' ||
+    item.actionStatus === 'pending' ||
+    item.actionStatus === 'success' ||
+    item.actionStatus === 'failed' ||
+    item.actionStatus === 'skipped'
+  ) {
+    return item.actionStatus;
+  }
+  return isServerCodexInspectionAction(item.action) ? 'pending' : 'none';
+};
+
+export const isActionableServerCodexInspectionResult = (
+  item: Pick<CodexInspectionResult, 'id' | 'action' | 'actionStatus'>
+) => {
+  const status = normalizeServerCodexInspectionActionStatus(item);
+  return (
+    item.id > 0 &&
+    isServerCodexInspectionAction(item.action) &&
+    (status === 'pending' || status === 'failed')
+  );
+};
+
+export const getCanonicalServerCodexInspectionActionIds = (
+  results: Array<Pick<CodexInspectionResult, 'id' | 'fileName' | 'action' | 'actionStatus'>>
+) => {
+  const canonicalIds = new Set<number>();
+  const seenFileNames = new Set<string>();
+  for (const item of results) {
+    const fileName = item.fileName.trim();
+    if (!isServerCodexInspectionAction(item.action) || !fileName || seenFileNames.has(fileName)) {
+      continue;
+    }
+    seenFileNames.add(fileName);
+    if (isActionableServerCodexInspectionResult(item)) {
+      canonicalIds.add(item.id);
+    }
+  }
+  return canonicalIds;
 };
 
 export const formatCurrentStateLabel = (item: CodexInspectionResultItem, t: TFunction) => {

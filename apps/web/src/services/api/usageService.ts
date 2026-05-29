@@ -185,6 +185,9 @@ export interface CodexInspectionResult {
   state?: string;
   action: string;
   actionReason: string;
+  actionStatus?: string;
+  executedAction?: string;
+  actionError?: string;
   statusCode?: number;
   usedPercent?: number;
   isQuota: boolean;
@@ -217,6 +220,7 @@ export interface CodexInspectionActionOutcome {
   fileName: string;
   displayAccount: string;
   action: string;
+  status: string;
   success: boolean;
   error?: string;
 }

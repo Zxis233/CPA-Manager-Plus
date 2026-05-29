@@ -23,6 +23,9 @@ import {
   formatAutoActionModeLabel,
   formatPercent,
   formatTimestamp,
+  getCanonicalServerCodexInspectionActionIds,
+  isActionableServerCodexInspectionResult,
+  normalizeServerCodexInspectionActionStatus,
   type StatusTone,
 } from '@/features/monitoring/model/codexInspectionPresentation';
 import { usePanelFeatureAvailability } from '@/hooks/usePanelFeatureAvailability';
@@ -98,7 +101,6 @@ const DEFAULT_SERVER_CODEX_CONFIG: NormalizedServerCodexInspectionConfig = {
 
 const RUNS_LIMIT = 30;
 
-type ServerCodexInspectionAction = 'delete' | 'disable' | 'enable';
 type ServerCodexInspectionResultFilter =
   | 'all'
   | 'delete'
@@ -458,19 +460,31 @@ function resolveActionLabel(action: string, t: ReturnType<typeof useTranslation>
   return action || t('common.not_set');
 }
 
-function isServerCodexInspectionAction(
-  action: string
-): action is ServerCodexInspectionAction {
-  return action === 'delete' || action === 'disable' || action === 'enable';
-}
-
 function normalizeServerAutoActionMode(mode: string): ManagerCodexInspectionAutoActionMode {
   if (mode === 'enable' || mode === 'disable' || mode === 'delete') return mode;
   return 'none';
 }
 
-function isActionableServerResult(item: CodexInspectionResult) {
-  return item.id > 0 && isServerCodexInspectionAction(item.action);
+function formatServerActionStatusLabel(
+  item: CodexInspectionResult,
+  t: ReturnType<typeof useTranslation>['t']
+) {
+  const status = normalizeServerCodexInspectionActionStatus(item);
+  if (status === 'success') {
+    return t('monitoring.server_codex_inspection_action_status_success', {
+      action: resolveActionLabel(item.executedAction || item.action, t),
+    });
+  }
+  if (status === 'failed') {
+    return t('monitoring.server_codex_inspection_action_status_failed');
+  }
+  if (status === 'skipped') {
+    return t('monitoring.server_codex_inspection_action_status_skipped');
+  }
+  if (status === 'pending') {
+    return t('monitoring.server_codex_inspection_action_status_pending');
+  }
+  return '';
 }
 
 function countServerResultActions(items: CodexInspectionResult[]) {
@@ -835,7 +849,7 @@ export function ServerCodexInspectionPage() {
         return;
       }
       const resultIds = Array.from(
-        new Set(targets.filter(isActionableServerResult).map((item) => item.id))
+        new Set(targets.filter(isActionableServerCodexInspectionResult).map((item) => item.id))
       );
       if (resultIds.length === 0) {
         showNotification(t('monitoring.server_codex_inspection_no_actions'), 'warning');
@@ -1489,7 +1503,8 @@ export function ServerCodexInspectionPage() {
   );
 
   const renderResultsPanel = (results: CodexInspectionResult[]) => {
-    const executableResults = results.filter(isActionableServerResult);
+    const canonicalExecutableIds = getCanonicalServerCodexInspectionActionIds(results);
+    const executableResults = results.filter((item) => canonicalExecutableIds.has(item.id));
     const canExecuteActions = detail?.run.status === 'completed';
     const resultsRun = detail?.run ?? null;
     const counts: Record<ServerCodexInspectionResultFilter, number> = {
@@ -1629,10 +1644,24 @@ export function ServerCodexInspectionPage() {
                     </td>
                     <td>
                       <div className={styles.serverResultOperation}>
-                        <span className={item.error ? styles.primaryError : styles.primaryReason}>
-                          {item.error || item.status || item.state || '--'}
-                        </span>
-                        {isActionableServerResult(item) ? (
+                        {(() => {
+                          const actionStatus = normalizeServerCodexInspectionActionStatus(item);
+                          const statusLabel = formatServerActionStatusLabel(item, t);
+                          const detailText =
+                            item.actionError || item.error || item.status || item.state || '--';
+                          return (
+                            <span
+                              className={
+                                actionStatus === 'failed' || item.actionError || item.error
+                                  ? styles.primaryError
+                                  : styles.primaryReason
+                              }
+                            >
+                              {statusLabel ? `${statusLabel} · ${detailText}` : detailText}
+                            </span>
+                          );
+                        })()}
+                        {canonicalExecutableIds.has(item.id) ? (
                           <Button
                             size="xs"
                             variant={item.action === 'delete' ? 'danger' : 'secondary'}
@@ -1647,6 +1676,10 @@ export function ServerCodexInspectionPage() {
                             })()}
                             {resolveActionLabel(item.action, t)}
                           </Button>
+                        ) : isActionableServerCodexInspectionResult(item) ? (
+                          <span className={styles.primaryReason}>
+                            {t('monitoring.server_codex_inspection_file_level_action_hint')}
+                          </span>
                         ) : item.action === 'reauth' ? (
                           <span className={styles.primaryReason}>
                             {t('monitoring.codex_inspection_manual_required')}
