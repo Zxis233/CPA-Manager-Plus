@@ -179,6 +179,9 @@
   "automation": {
     "eyebrow": "Automation",
     "title": "自动化设置",
+    "section_title": "自动化开关",
+    "section_hint": "当前 Manager Server 生效的自动化开关。此处为只读。",
+    "restart_required_note": "这些开关在启动时生效。请通过环境变量或 config.json 修改并重启服务后生效。",
     "description": "查看当前生效的自动化开关与安全边界。这里是只读视图，修改请通过环境变量或 config.json。",
     "readonly_note": "这些开关在这里是只读的。请通过环境变量或 config.json 配置后重启服务生效。",
     "refresh": "刷新",

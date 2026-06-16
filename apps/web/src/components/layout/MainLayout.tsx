@@ -485,12 +485,6 @@ export function MainLayout() {
         icon: sidebarIcons.aiProviders,
       },
       ...pluginControlNavItems,
-      {
-        path: '/automation',
-        label: t('nav.automation'),
-        shortLabel: navShortLabel('nav.automation', t('nav.automation')),
-        icon: sidebarIcons.config,
-      },
     ],
     [
       {

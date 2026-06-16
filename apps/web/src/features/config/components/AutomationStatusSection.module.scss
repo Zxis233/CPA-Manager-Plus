@@ -1,95 +1,71 @@
-.page {
+.section {
   display: grid;
-  gap: 14px;
-  min-width: 0;
-  color: var(--text-primary);
+  gap: 12px;
 }
 
-.hero {
-  position: relative;
-  overflow: hidden;
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sectionHeaderText {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 14px;
-  align-items: end;
-  padding: 18px;
-  border-radius: 18px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-primary);
-  box-shadow: var(--shadow);
+  gap: 4px;
 }
 
-.hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--primary-color) 14%, transparent),
-    transparent 38%
-  );
-  opacity: 0.6;
-}
-
-.heroMain,
-.heroActions {
-  position: relative;
-  z-index: 1;
-}
-
-.kicker {
-  margin: 0 0 6px;
-  color: var(--primary-color);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
-.title {
+.sectionTitle {
   margin: 0;
-  font-size: 22px;
+  font-size: 15px;
   font-weight: 700;
 }
 
-.description {
-  margin: 6px 0 0;
-  color: var(--text-secondary);
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-.note {
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid var(--border-color);
-  background: color-mix(in srgb, var(--surface-subtle) 70%, transparent);
+.sectionHint {
+  margin: 0;
   color: var(--text-secondary);
   font-size: 12px;
   line-height: 1.6;
 }
 
+.restartNote {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--warning-color) 40%, transparent);
+  background: color-mix(in srgb, var(--warning-color) 8%, transparent);
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.restartIcon {
+  margin-top: 2px;
+  color: var(--warning-color);
+  flex-shrink: 0;
+}
+
 .cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
 }
 
 .card {
   display: grid;
-  gap: 12px;
-  padding: 16px;
-  border-radius: 16px;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 14px;
   border: 1px solid var(--border-color);
-  background: var(--bg-primary);
-  box-shadow: var(--shadow);
+  background: color-mix(in srgb, var(--surface-subtle) 50%, var(--bg-primary));
 }
 
 .cardHeader {
   display: grid;
-  gap: 6px;
+  gap: 4px;
 }
 
 .cardHeading {
@@ -101,7 +77,7 @@
 
 .cardTitle {
   margin: 0;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 700;
 }
 
@@ -109,12 +85,13 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 2px 10px;
+  padding: 2px 9px;
   border-radius: 999px;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.04em;
   border: 1px solid transparent;
+  white-space: nowrap;
 }
 
 .badgeOn {
@@ -138,58 +115,58 @@
 
 .metaList {
   display: grid;
-  gap: 6px;
+  gap: 4px;
   margin: 0;
-  padding: 10px 12px;
+  padding: 8px 10px;
   border-radius: 10px;
   border: 1px solid var(--border-color);
-  background: color-mix(in srgb, var(--surface-subtle) 60%, transparent);
+  background: color-mix(in srgb, var(--surface-subtle) 50%, transparent);
 }
 
 .metaRow {
   display: grid;
-  grid-template-columns: minmax(0, 120px) 1fr;
+  grid-template-columns: minmax(0, 110px) 1fr;
   align-items: baseline;
   gap: 8px;
 }
 
 .metaRow dt {
   color: var(--text-secondary);
-  font-size: 11px;
+  font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
 
 .metaRow dd {
   margin: 0;
-  font-size: 12px;
+  font-size: 11px;
   word-break: break-all;
 }
 
 .metaRow code {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-primary);
 }
 
 .behaviorList {
   display: grid;
-  gap: 6px;
+  gap: 4px;
   margin: 0;
-  padding-left: 18px;
+  padding-left: 16px;
   color: var(--text-secondary);
-  font-size: 12px;
-  line-height: 1.6;
+  font-size: 11px;
+  line-height: 1.55;
 }
 
 .dependencyNote {
   margin: 0;
-  padding: 8px 10px;
+  padding: 6px 9px;
   border-radius: 10px;
   border: 1px solid color-mix(in srgb, var(--warning-color) 40%, transparent);
   background: color-mix(in srgb, var(--warning-color) 10%, transparent);
   color: var(--text-secondary);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .cardActions {
@@ -200,8 +177,8 @@
 .errorState {
   display: grid;
   gap: 4px;
-  padding: 14px 16px;
-  border-radius: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
   border: 1px solid color-mix(in srgb, var(--error-color) 40%, transparent);
   background: color-mix(in srgb, var(--error-color) 8%, transparent);
   color: var(--error-color);

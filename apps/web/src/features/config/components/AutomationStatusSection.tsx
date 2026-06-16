@@ -6,28 +6,28 @@ import { IconRefreshCw } from '@/components/ui/icons';
 import { usePanelFeatureAvailability } from '@/hooks/usePanelFeatureAvailability';
 import { usageServiceApi, type AutomationStatus } from '@/services/api/usageService';
 import { useAuthStore, useNotificationStore } from '@/stores';
-import styles from './AutomationSettingsPage.module.scss';
+import styles from './AutomationStatusSection.module.scss';
 
 type CapabilityKey = 'quotaCooldown' | 'accountActions' | 'accountActionsAutoDisable';
 
-export function AutomationSettingsPage() {
+export function AutomationStatusSection() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const managementKey = useAuthStore((state) => state.managementKey);
   const { showNotification } = useNotificationStore();
   const featureAvailability = usePanelFeatureAvailability();
-  const managerBase = featureAvailability.managerServiceBase;
+  const managerServiceBase = featureAvailability.managerServiceBase;
 
   const [status, setStatus] = useState<AutomationStatus | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const load = useCallback(async () => {
-    if (!managerBase || !managementKey) return;
+    if (!managerServiceBase || !managementKey) return;
     setLoading(true);
     setError('');
     try {
-      const data = await usageServiceApi.getAutomationStatus(managerBase, managementKey);
+      const data = await usageServiceApi.getAutomationStatus(managerServiceBase, managementKey);
       setStatus(data);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err || 'request failed');
@@ -39,7 +39,7 @@ export function AutomationSettingsPage() {
     } finally {
       setLoading(false);
     }
-  }, [managerBase, managementKey, showNotification, t]);
+  }, [managerServiceBase, managementKey, showNotification, t]);
 
   useEffect(() => {
     void load();
@@ -57,7 +57,7 @@ export function AutomationSettingsPage() {
       <section className={styles.card} key={key}>
         <header className={styles.cardHeader}>
           <div className={styles.cardHeading}>
-            <h2 className={styles.cardTitle}>{t(`automation.${key}_title`)}</h2>
+            <h4 className={styles.cardTitle}>{t(`automation.${key}_title`)}</h4>
             <span
               className={`${styles.badge} ${enabled ? styles.badgeOn : styles.badgeOff}`}
               data-testid={`automation-${key}-badge`}
@@ -104,8 +104,12 @@ export function AutomationSettingsPage() {
 
         {key === 'accountActions' ? (
           <div className={styles.cardActions}>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/monitoring/account-actions')}>
-              {t('automation.open_pending_accounts', { defaultValue: 'Open Pending Accounts' })}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/monitoring/account-actions')}
+            >
+              {t('automation.open_pending_accounts', { defaultValue: 'Open Auth Issues' })}
             </Button>
           </div>
         ) : null}
@@ -114,27 +118,34 @@ export function AutomationSettingsPage() {
   };
 
   return (
-    <div className={styles.page}>
-      <section className={styles.hero}>
-        <div className={styles.heroMain}>
-          <p className={styles.kicker}>{t('automation.eyebrow', { defaultValue: 'Automation' })}</p>
-          <h1 className={styles.title}>{t('automation.title')}</h1>
-          <p className={styles.description}>{t('automation.description')}</p>
+    <section className={styles.section}>
+      <div className={styles.sectionHeader}>
+        <div className={styles.sectionHeaderText}>
+          <h3 className={styles.sectionTitle}>
+            {t('automation.section_title', { defaultValue: 'Automation Switches' })}
+          </h3>
+          <p className={styles.sectionHint}>
+            {t('automation.section_hint', {
+              defaultValue:
+                'Effective automation switches for this Manager Server. Read-only here.',
+            })}
+          </p>
         </div>
-        <div className={styles.heroActions}>
-          <Button variant="ghost" size="sm" onClick={() => void load()} disabled={loading}>
-            <IconRefreshCw size={14} />
-            {t('automation.refresh', { defaultValue: 'Refresh' })}
-          </Button>
-        </div>
-      </section>
+        <Button variant="ghost" size="sm" onClick={() => void load()} disabled={loading}>
+          <IconRefreshCw size={14} />
+          {t('automation.refresh', { defaultValue: 'Refresh' })}
+        </Button>
+      </div>
 
-      <section className={styles.note}>
-        {t('automation.readonly_note', {
-          defaultValue:
-            'These switches are read-only here. Configure them via environment variables or config.json and restart the service.',
-        })}
-      </section>
+      <div className={styles.restartNote}>
+        <IconRefreshCw size={14} className={styles.restartIcon} />
+        <span>
+          {t('automation.restart_required_note', {
+            defaultValue:
+              'These switches take effect at startup. Change them via environment variables or config.json and restart the service to apply.',
+          })}
+        </span>
+      </div>
 
       {error ? (
         <div className={styles.errorState}>
@@ -148,6 +159,6 @@ export function AutomationSettingsPage() {
           )}
         </div>
       )}
-    </div>
+    </section>
   );
 }

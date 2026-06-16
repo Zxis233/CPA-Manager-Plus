@@ -191,6 +191,9 @@
   "automation": {
     "eyebrow": "Automation",
     "title": "Automation Settings",
+    "section_title": "Automation Switches",
+    "section_hint": "Effective automation switches for this Manager Server. Read-only here.",
+    "restart_required_note": "These switches take effect at startup. Change them via environment variables or config.json and restart the service to apply.",
     "description": "View the effective automation switches and their safety boundaries. This view is read-only; change them via environment variables or config.json.",
     "readonly_note": "These switches are read-only here. Configure them via environment variables or config.json and restart the service to apply.",
     "refresh": "Refresh",
