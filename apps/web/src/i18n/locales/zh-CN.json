@@ -911,7 +911,9 @@
     "prefix_proxy_html_challenge": "下载到的是 HTML 验证页面，不是认证 JSON 对象。请重新认证或替换该认证文件后再编辑字段。",
     "prefix_proxy_saved_success": "已更新认证文件 \"{{name}}\"",
     "quota_refresh_success": "已刷新 \"{{name}}\" 的额度",
-    "quota_refresh_failed": "刷新 \"{{name}}\" 的额度失败：{{message}}"
+    "quota_refresh_failed": "刷新 \"{{name}}\" 的额度失败：{{message}}",
+    "quota_cooldown_badge": "冷却至 {{recoverAt}}",
+    "quota_cooldown_badge_title": "此认证文件处于 CPAMP 管理的额度冷却中，将被自动恢复。它不是 CPA 的原生禁用状态。Owner：{{owner}}。预计恢复：{{recoverAt}}。"
   },
   "antigravity_quota": {
     "title": "Antigravity 额度",

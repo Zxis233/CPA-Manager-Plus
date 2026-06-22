@@ -910,7 +910,9 @@
     "prefix_proxy_html_challenge": "下載到的是 HTML 驗證頁面，不是驗證 JSON 物件。請重新驗證或替換該驗證檔案後再編輯欄位。",
     "prefix_proxy_saved_success": "已更新驗證檔案「{{name}}」",
     "quota_refresh_success": "已重新整理「{{name}}」的配額",
-    "quota_refresh_failed": "重新整理「{{name}}」的配額失敗：{{message}}"
+    "quota_refresh_failed": "重新整理「{{name}}」的配額失敗：{{message}}",
+    "quota_cooldown_badge": "冷卻至 {{recoverAt}}",
+    "quota_cooldown_badge_title": "此認證檔案處於 CPAMP 管理的額度冷卻中，將被自動恢復。它不是 CPA 的原生停用狀態。Owner：{{owner}}。預計恢復：{{recoverAt}}。"
   },
   "antigravity_quota": {
     "title": "Antigravity 配額",

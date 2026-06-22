@@ -922,7 +922,9 @@
     "prefix_proxy_html_challenge": "Downloaded content is an HTML challenge page, not an auth JSON object. Re-authenticate or replace this auth file before editing fields.",
     "prefix_proxy_saved_success": "Updated auth file \"{{name}}\" successfully",
     "quota_refresh_success": "Quota refreshed for \"{{name}}\"",
-    "quota_refresh_failed": "Failed to refresh quota for \"{{name}}\": {{message}}"
+    "quota_refresh_failed": "Failed to refresh quota for \"{{name}}\": {{message}}",
+    "quota_cooldown_badge": "Cooldown until {{recoverAt}}",
+    "quota_cooldown_badge_title": "This auth file is in a CPAMP-managed quota cooldown and will be recovered automatically. It is not the native CPA disabled state. Owner: {{owner}}. Expected recovery: {{recoverAt}}."
   },
   "antigravity_quota": {
     "title": "Antigravity Quota",

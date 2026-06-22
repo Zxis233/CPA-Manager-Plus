@@ -53,7 +53,7 @@ import {
   createCodexReauthTargetFromAuthFile,
   type CodexReauthTarget,
 } from '@/features/oauth/codexReauthModel';
-import { usageServiceApi, type CodexInspectionResult } from '@/services/api/usageService';
+import { usageServiceApi, type CodexInspectionResult, type QuotaCooldownInfo } from '@/services/api/usageService';
 import { useAuthFilesData } from '@/features/authFiles/hooks/useAuthFilesData';
 import { useAuthFilesModels } from '@/features/authFiles/hooks/useAuthFilesModels';
 import { useAuthFilesOauth } from '@/features/authFiles/hooks/useAuthFilesOauth';
@@ -146,6 +146,7 @@ export function AuthFilesPage() {
   const resolvedTheme: ResolvedTheme = useThemeStore((state) => state.resolvedTheme);
   const codexQuota = useQuotaStore((state) => state.codexQuota);
   const featureAvailability = usePanelFeatureAvailability();
+  const managerServiceBase = featureAvailability.managerServiceBase;
   const pageTransitionLayer = usePageTransitionLayer();
   const isCurrentLayer = pageTransitionLayer ? pageTransitionLayer.status === 'current' : true;
   const navigate = useNavigate();
@@ -175,10 +176,22 @@ export function AuthFilesPage() {
   const [lastCodexInspectionResults, setLastCodexInspectionResults] = useState<
     AuthFileCodexInspectionSnapshot[]
   >([]);
+  const [quotaCooldowns, setQuotaCooldowns] = useState<Map<string, QuotaCooldownInfo>>(
+    () => new Map()
+  );
   const floatingBatchActionsRef = useRef<HTMLDivElement>(null);
   const batchActionAnimationRef = useRef<AnimationPlaybackControlsWithThen | null>(null);
   const previousSelectionCountRef = useRef(0);
   const selectionCountRef = useRef(0);
+  // Generation token for in-flight cooldown fetches. Every fetch and every
+  // context identity change bump it, so a slow, superseded response can be
+  // detected and dropped — otherwise it would re-introduce stale badges after
+  // the old context was invalidated.
+  const cooldownReqId = useRef(0);
+  // Tracks the context identity so the layout effect can detect cross-context
+  // transitions synchronously (before passive effects fire) and invalidate any
+  // in-flight request that belongs to the old context.
+  const cooldownContextRef = useRef({ managerServiceBase, managementKey });
 
   const {
     files,
@@ -505,6 +518,57 @@ export function AuthFilesPage() {
       void loadFiles().catch(() => {});
     },
     isCurrentLayer ? 240_000 : null
+  );
+
+  const loadQuotaCooldowns = useCallback(async () => {
+    // Stamp this fetch with a fresh id so a later fetch or context identity
+    // invalidation can supersede it. If the generation has changed by the time
+    // we land, we drop the result instead of writing stale badges back.
+    const id = ++cooldownReqId.current;
+    try {
+      const items = await usageServiceApi.getActiveQuotaCooldowns(managerServiceBase, managementKey);
+      if (id !== cooldownReqId.current) return;
+      const next = new Map<string, QuotaCooldownInfo>();
+      for (const item of items) {
+        if (!item.authFileName) continue;
+        const existing = next.get(item.authFileName);
+        if (!existing || (item.recoverAtMs ?? 0) > (existing.recoverAtMs ?? 0)) {
+          next.set(item.authFileName, item);
+        }
+      }
+      setQuotaCooldowns(next);
+    } catch {
+      // The cooldown badge is a derived hint; fail silently and keep the last known state.
+    }
+  }, [managerServiceBase, managementKey]);
+
+  // Synchronously invalidate in-flight cooldown requests when the context
+  // (managerServiceBase or managementKey) changes, regardless of direction
+  // (A→B, A→empty, empty→A). This runs in the layout phase, before any
+  // passive effect that might fire a new loadQuotaCooldowns, so a stale
+  // response that resolves between renders or inside the gap between a
+  // re-render and its passive effects will find its generation token already
+  // invalidated.
+  useLayoutEffect(() => {
+    const prev = cooldownContextRef.current;
+    if (prev.managerServiceBase === managerServiceBase && prev.managementKey === managementKey) {
+      return;
+    }
+    cooldownContextRef.current = { managerServiceBase, managementKey };
+    cooldownReqId.current += 1;
+    setQuotaCooldowns((current) => (current.size === 0 ? current : new Map()));
+  }, [managerServiceBase, managementKey]);
+
+  useEffect(() => {
+    if (!isCurrentLayer || !managerServiceBase) return;
+    void loadQuotaCooldowns();
+  }, [isCurrentLayer, managerServiceBase, loadQuotaCooldowns]);
+
+  useInterval(
+    () => {
+      void loadQuotaCooldowns();
+    },
+    isCurrentLayer && managerServiceBase ? 60_000 : null
   );
 
   const existingTypes = useMemo(() => {
@@ -1255,6 +1319,7 @@ export function AuthFilesPage() {
                       codexStatusBadges={codexStatus?.badges ?? []}
                       codexNeedsReauth={codexStatus?.needsReauth ?? false}
                       antigravitySubscription={antigravitySubscriptions[file.name]}
+                      quotaCooldown={quotaCooldowns.get(file.name)}
                       onShowModels={showModels}
                       onReauth={(targetFile) =>
                         setCodexReauthTarget(createCodexReauthTargetFromAuthFile(targetFile))
