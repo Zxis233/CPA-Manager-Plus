@@ -15,7 +15,6 @@ import {
   ANTIGRAVITY_CONFIG,
   CLAUDE_CONFIG,
   CODEX_CONFIG,
-  GEMINI_CLI_CONFIG,
   KIMI_CONFIG,
   XAI_CONFIG
 } from '@/components/quota';
